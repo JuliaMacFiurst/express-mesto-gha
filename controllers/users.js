@@ -1,46 +1,47 @@
 const User = require('../models/user');
+const BadRequest = require('../errors/BadRequest');
+const Default = require('../errors/Default');
+const NotFound = require('../errors/NotFound');
 
 const getUsers = async (req, res) => {
-  // User.find({})
-  //   .then((users) => res.send({ data: users }))
-  //   .catch((err) => res.status(500).send({ message: err.message }));
-  const users = await User.find({});
+  try {
+    const users = await User.find({});
 
-  res.send(users);
+    res.send(users);
+  } catch (err) {
+    throw new Default(err.message);
+  }
 };
 
 const getUserById = async (req, res) => {
-  const user = await User.findById(req.params.id);
+  try {
+    const user = await User.findById(req.params.id);
 
-  res.send(user);
-  // User.findById(req.params._id)
-  //   .then((user) => {
-  //     res.send({ data: user });
-  //   })
-  //   .catch((err) => {
-  //     res.status(500).send({ message: err.message });
-  //   });
+    res.send(
+      {
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        _id: user._id,
+      },
+    );
+  } catch (err) {
+    throw new NotFound('Пользователь по указанному _id не найден. ');
+  }
 };
 
 const createUser = async (req, res) => {
-  const user = await User.create(req.body);
+  try {
+    const user = await User.create(req.body);
 
-  res.send({
-    data: {
-      name: user.name, about: user.about, avatar: user.avatar,
-    },
-  });
-  // const { name, about, avatar } = req.body;
-
-  // User.create({ name, about, avatar })
-  //   .then((user) => res.send({
-  //     data: {
-  //       name: user.name, about: user.about, avatar: user.avatar,
-  //     },
-  //   }))
-  //   .catch((err) => {
-  //     res.status(500).send({ message: err.message });
-  //   });
+    res.send({
+      data: {
+        name: user.name, about: user.about, avatar: user.avatar,
+      },
+    });
+  } catch (err) {
+    throw new BadRequest('Переданы некорректные данные при создании пользователя. ');
+  }
 };
 
 const updateUser = (req, res) => {
@@ -49,16 +50,16 @@ const updateUser = (req, res) => {
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
+        throw new NotFound('Пользователь с указанным _id не найден.');
       } else {
-        res.send({ user });
+        res.send({ name: user.name, about: user.about });
       }
     })
     .catch((err) => {
       if (err) {
-        res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
+        throw new BadRequest('Переданы некорректные данные при обновлении профиля.');
       } else {
-        res.status(500).send({ message: err.message });
+        throw new Default(err.message);
       }
     });
 };
@@ -69,16 +70,16 @@ const updateAvatar = (req, res) => {
   User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
+        throw new NotFound('Пользователь с указанным _id не найден.');
       } else {
-        res.send({ user });
+        res.send({ avatar: user.avatar });
       }
     })
     .catch((err) => {
       if (err) {
-        res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
+        throw new BadRequest('Переданы некорректные данные при обновлении профиля.');
       } else {
-        res.status(500).send({ message: err.message });
+        throw new Default(err.message);
       }
     });
 };
