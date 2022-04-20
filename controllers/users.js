@@ -57,7 +57,7 @@ const updateUser = (req, res) => {
     })
     .catch((err) => {
       if (err) {
-        throw new BadRequest('Переданы некорректные данные при обновлении профиля.');
+        throw new BadRequest(err.message, 'Переданы некорректные данные при обновлении профиля.');
       } else {
         throw new Default(err.message);
       }
@@ -66,13 +66,13 @@ const updateUser = (req, res) => {
 
 const updateAvatar = (req, res) => {
   const userId = req.user._id;
-  const { avatar } = req.body;
-  User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
+  const user = req.body;
+  User.findByIdAndUpdate(userId, { avatar: user.avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         throw new NotFound('Пользователь с указанным _id не найден.');
       } else {
-        res.send({ data: user });
+        res.send({ avatar: user.avatar });
       }
     })
     .catch((err) => {
