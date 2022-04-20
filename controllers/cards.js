@@ -1,7 +1,7 @@
 const Card = require('../models/card');
 const BadRequest = require('../errors/BadRequest');
 const Default = require('../errors/Default');
-// const NotFound = require('../errors/NotFound');
+const NotFound = require('../errors/NotFound');
 
 const getCards = async (req, res) => {
   try {
@@ -34,8 +34,8 @@ const deleteCard = async (req, res) => {
 
     res.send({ card });
   } catch (err) {
-    // throw new NotFound('Карточка с таким id не найдена.');
-    res.status(err.status).send(err.message, 'Карточка с таким id не найдена.');
+    throw new NotFound('Карточка с таким id не найдена.');
+    // res.status(err.status).send(err.message, 'Карточка с таким id не найдена.');
   }
 };
 
@@ -52,8 +52,8 @@ const likeCard = async (req, res) => {
     if (err.name === 'ValidationError') {
       throw new BadRequest('Переданы некорректные данные для постановки/снятии лайка.');
     } else {
-      // throw new NotFound('Передан несуществующий _id карточки.');
-      res.status(res.status).send({ message: 'Передан несуществующий _id карточки.' });
+      throw new NotFound('Передан несуществующий _id карточки.');
+      // res.status(res.status).send({ message: 'Передан несуществующий _id карточки.' });
     }
   }
 };
@@ -71,8 +71,8 @@ const dislikeCard = async (req, res) => {
     if (err.name === 'ValidationError') {
       throw new BadRequest('Переданы некорректные данные для постановки/снятии лайка.');
     } else {
-      // throw new NotFound('Передан несуществующий _id карточки.');
-      res.status(res.status).send({ message: 'Передан несуществующий _id карточки.' });
+      throw new NotFound('Передан несуществующий _id карточки.');
+      // res.status(res.status).send({ message: 'Передан несуществующий _id карточки.' });
     }
   }
 };
