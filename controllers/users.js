@@ -1,7 +1,7 @@
 const User = require('../models/user');
 const BadRequest = require('../errors/BadRequest');
 const Default = require('../errors/Default');
-const NotFound = require('../errors/NotFound');
+// const NotFound = require('../errors/NotFound');
 
 const getUsers = async (req, res) => {
   try {
@@ -19,14 +19,12 @@ const getUserById = async (req, res) => {
 
     res.send(
       {
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-        _id: user._id,
+        data: user,
       },
     );
   } catch (err) {
-    throw new NotFound('Пользователь по указанному _id не найден. ');
+    // throw new NotFound(err.message, 'Пользователь по указанному _id не найден. ');
+    res.status(err.status).send(err.message, 'Пользователь по указанному _id не найден.');
   }
 };
 
@@ -36,7 +34,10 @@ const createUser = async (req, res) => {
 
     res.send({
       data: {
-        name: user.name, about: user.about, avatar: user.avatar,
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        _id: user._id,
       },
     });
   } catch (err) {
@@ -50,7 +51,8 @@ const updateUser = (req, res) => {
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        throw new NotFound('Пользователь с указанным _id не найден.');
+        // throw new NotFound('Пользователь с указанным _id не найден.');
+        res.status(res.status).send({ message: 'Пользователь по указанному _id не найден.' });
       } else {
         res.send({ name: user.name, about: user.about });
       }
@@ -70,7 +72,8 @@ const updateAvatar = (req, res) => {
   User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        throw new NotFound('Пользователь с указанным _id не найден.');
+        // throw new NotFound('Пользователь с указанным _id не найден.');
+        res.status(res.status).send({ message: 'Пользователь по указанному _id не найден.' });
       } else {
         res.send({ avatar: user.avatar });
       }
