@@ -41,7 +41,11 @@ const createUser = async (req, res) => {
       },
     });
   } catch (err) {
-    throw new BadRequest('Переданы некорректные данные при создании пользователя. ');
+    if (err.name === 'ValidationError') {
+      throw new BadRequest('Переданы некорректные данные при создании пользователя. ');
+    } else {
+      throw new Default(err.message);
+    }
   }
 };
 
