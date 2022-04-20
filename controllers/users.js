@@ -66,8 +66,8 @@ const updateUser = (req, res) => {
 
 const updateAvatar = (req, res) => {
   const userId = req.user._id;
-  const user = req.body;
-  User.findByIdAndUpdate(userId, { avatar: user.avatar }, { new: true, runValidators: true })
+  const { avatar } = req.body;
+  User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         throw new NotFound('Пользователь с указанным _id не найден.');
