@@ -28,37 +28,17 @@ const getUserById = async (req, res) => {
   }
 };
 
-const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+const createUser = async (req, res) => {
+  try {
+    const user = await User.create(req.body);
 
-  User.create({ name, about, avatar })
-    .then((user) => {
-      res.status(200).send({
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-        _id: user._id,
-        email: user.email,
-      });
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        throw new BadRequest(err.message, 'Переданы некорректные данные при создании пользователя. ');
-      }
-    });
+    res.status(200).send(user);
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      throw new BadRequest('Переданы некорректные данные при создании пользователя. ');
+    }
+  }
 };
-  // try {
-  //   const user = await User.create(req.body);
-
-  //   res.status(200).send(user);
-  // } catch (err) {
-  //   if (err.name === 'ValidationError') {
-  //     throw new BadRequest('Переданы некорректные данные при создании пользователя. ');
-  //   } else {
-  //     throw new Default(err.message);
-  //   }
-  // }
-// };
 
 const updateUser = (req, res) => {
   const userId = req.user._id;
