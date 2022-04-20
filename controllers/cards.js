@@ -1,7 +1,7 @@
 const Card = require('../models/card');
 const BadRequest = require('../errors/BadRequest');
 const Default = require('../errors/Default');
-const NotFound = require('../errors/NotFound');
+// const NotFound = require('../errors/NotFound');
 
 const getCards = async (req, res) => {
   try {
