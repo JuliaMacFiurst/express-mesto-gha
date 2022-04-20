@@ -1,14 +1,16 @@
 const Card = require('../models/card');
-const BadRequest = require('../errors/BadRequest');
-const Default = require('../errors/Default');
-const NotFound = require('../errors/NotFound');
+const {
+  ERR_BAD_REQUEST,
+  ERR_DEFAULT,
+  ERR_NOT_FOUND,
+} = require('../errors/errors');
 
 const getCards = async (req, res) => {
   try {
     const cards = await Card.find({});
     res.send(cards);
   } catch (err) {
-    throw new Default(err.message);
+    res.status(ERR_DEFAULT).send({ message: err.message });
   }
 };
 
@@ -21,9 +23,9 @@ const createCard = async (req, res) => {
     res.send({ name, link, owner });
   } catch (err) {
     if (err.name === 'ValidationError') {
-      throw new BadRequest(err.message);
+      res.status(ERR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании карточки.' });
     } else {
-      throw new Default(err.message);
+      res.status(ERR_DEFAULT).send({ message: err.message });
     }
   }
 };
@@ -34,8 +36,7 @@ const deleteCard = async (req, res) => {
 
     res.send({ card });
   } catch (err) {
-    throw new NotFound('Карточка с таким id не найдена.');
-    // res.status(err.status).send(err.message, 'Карточка с таким id не найдена.');
+    res.status(ERR_NOT_FOUND).send({ message: 'Карточка с таким id не найдена.' });
   }
 };
 
@@ -50,10 +51,9 @@ const likeCard = async (req, res) => {
     res.send({ card });
   } catch (err) {
     if (err.name === 'ValidationError') {
-      throw new BadRequest('Переданы некорректные данные для постановки/снятии лайка.');
+      res.status(ERR_BAD_REQUEST).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
     } else {
-      throw new NotFound('Передан несуществующий _id карточки.');
-      // res.status(res.status).send({ message: 'Передан несуществующий _id карточки.' });
+      res.status(ERR_NOT_FOUND).send({ message: 'Передан несуществующий _id карточки.' });
     }
   }
 };
@@ -69,10 +69,9 @@ const dislikeCard = async (req, res) => {
     res.send({ card });
   } catch (err) {
     if (err.name === 'ValidationError') {
-      throw new BadRequest('Переданы некорректные данные для постановки/снятии лайка.');
+      res.status(ERR_BAD_REQUEST).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
     } else {
-      throw new NotFound('Передан несуществующий _id карточки.');
-      // res.status(res.status).send({ message: 'Передан несуществующий _id карточки.' });
+      res.status(ERR_NOT_FOUND).send({ message: 'Передан несуществующий _id карточки.' });
     }
   }
 };
