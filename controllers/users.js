@@ -72,12 +72,12 @@ const updateAvatar = (req, res) => {
       if (!user) {
         throw new NotFound('Пользователь с указанным _id не найден.');
       } else {
-        res.send({ avatar: user.avatar });
+        res.send({ data: user });
       }
     })
     .catch((err) => {
       if (err) {
-        throw new BadRequest('Переданы некорректные данные при обновлении профиля.');
+        throw new BadRequest(err.message, 'Переданы некорректные данные при обновлении профиля.');
       } else {
         throw new Default(err.message);
       }
