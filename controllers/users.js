@@ -25,7 +25,11 @@ const getUserById = async (req, res) => {
       },
     );
   } catch (err) {
-    res.status(ERR_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
+    if (err.name === 'CastError') {
+      res.status(ERR_BAD_REQUEST).send({ message: 'Пользователь по указанному _id не найден.' });
+    } else {
+      res.status(ERR_DEFAULT).send({ message: err.message });
+    }
   }
 };
 
@@ -36,7 +40,7 @@ const createUser = async (req, res) => {
     res.status(200).send(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      res.status(ERR_BAD_REQUEST).send({ massage: 'Переданы некорректные данные при создании пользователя.' });
+      res.status(ERR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя.' });
     } else {
       res.status(ERR_DEFAULT).send({ message: err.message });
     }
