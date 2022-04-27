@@ -1,3 +1,6 @@
+const bcrypt = require('bcrypt');
+
+const SALT_ROUNDS = 10;
 const User = require('../models/user');
 const {
   ERR_BAD_REQUEST,
@@ -33,18 +36,32 @@ const getUserById = async (req, res) => {
   }
 };
 
-const createUser = async (req, res) => {
-  try {
-    const user = await User.create(req.body);
+const createUser = (req, res) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
 
-    res.status(200).send(user);
-  } catch (err) {
-    if (err.name === 'ValidationError') {
-      res.status(ERR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-    } else {
-      res.status(ERR_DEFAULT).send({ message: err.message });
-    }
-  }
+  bcrypt.hash(password, SALT_ROUNDS)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
+    .then((user) => res.send({
+      name: user.name, about: user.about, avatar: user.avatar, email: user.email,
+    }))
+    .catch((err) => {
+      if (err.code === 11000) {
+        res.status(409).send({ message: 'Такой пользователь уже существует.' });
+      }
+      if (err.name === 'ValidationError') {
+        res.status(ERR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      }
+      if (err.code === 'ValidationError') {
+        res.status(ERR_DEFAULT).send({ message: err.message });
+      }
+    })
+    .catch(() => {
+      res.status(ERR_BAD_REQUEST).send({ message: 'Проблема с хешированием пароля' });
+    });
 };
 
 const updateUser = (req, res) => {
@@ -55,7 +72,7 @@ const updateUser = (req, res) => {
       if (!user) {
         res.status(ERR_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
       } else {
-        res.send({ name: user.name, about: user.about });
+        res.send({ data: user });
       }
     })
     .catch((err) => {
@@ -66,6 +83,48 @@ const updateUser = (req, res) => {
       }
     });
 };
+//   const { name, about } = req.body;
+//   const userId = req.user._id;
+
+//   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
+//     .then((user) => res.send({ data: user }))
+//     .catch((err) => {
+//       if (err) {
+//                 res.status(ERR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
+//               } else {
+//                 res.status(ERR_DEFAULT).send({ message: err.message });
+//               }
+//             });
+// };
+
+const getCurrentUser = (req, res, next) => {
+  User.findById(req.user._id)
+    .orFail()
+    .catch(() => {
+      res.status(ERR_NOT_FOUND).send({ message: 'Пользователь по заданному ID отсутствует в базе данных' });
+    })
+    .then((currentUser) => res.send({ currentUser }))
+    .catch(next);
+};
+
+// const getCurrentUser = async (req, res) => {
+//   try {
+//     const user = await User.findById(req.user._id)
+//       .orFail(() => {
+//         res.status(ERR_NOT_FOUND).send({ message: 'Пользователь по заданному ID отсутствует в базе данных' });
+//       });
+
+//     res.send({ data: user });
+//   } catch (err) {
+//     if (err.name === 'CastError') {
+//       res.status(ERR_BAD_REQUEST).send({ message: 'Ошибка в формате ID пользователя' });
+//     } else if (err.statusCode === ERR_NOT_FOUND) {
+//       res.status(ERR_NOT_FOUND).send({ message: 'Пользователь не найден.' });
+//     } else {
+//       res.status(ERR_DEFAULT).send({ message: err.message });
+//     }
+//   }
+// };
 
 const updateAvatar = (req, res) => {
   const userId = req.user._id;
@@ -93,4 +152,5 @@ module.exports = {
   createUser,
   updateUser,
   updateAvatar,
+  getCurrentUser,
 };
