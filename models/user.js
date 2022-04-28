@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
   name: { // у пользователя есть имя — опишем требования к имени в схеме:
@@ -36,11 +37,22 @@ const userSchema = new mongoose.Schema({
     select: false,
   },
 });
+
+userSchema.statics.findUserByCredentials = function (email, password) {
+  return this.findOne({ email }).select('+password')
+    .then((user) => {
+      if (!user) {
+        Error.status(401).send({ message: 'Неправильная почта или пароль.' });
+      }
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            Error.status(401).send({ message: 'Неправильная почта или пароль.' });
+          }
+          return user;
+        });
+    });
+};
+
 // создаём модель и экспортируем её
 module.exports = mongoose.model('user', userSchema);
-
-// User.findOne({ email })
-//     .then((user) => {
-//       if (user) {
-//         return res.status(409).send({ message: 'Такой пользователь уже существует' });
-//       }

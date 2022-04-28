@@ -1,14 +1,16 @@
 const bcrypt = require('bcrypt');
 
+
 const SALT_ROUNDS = 10;
 const User = require('../models/user');
+// const { isAuthorized } = require('../middlewares/auth');
 const {
   ERR_BAD_REQUEST,
   ERR_DEFAULT,
   ERR_NOT_FOUND,
 } = require('../errors/errors');
 
-const getUsers = async (req, res) => {
+const getUsers = async (req, res, next) => {
   try {
     const users = await User.find({});
 
@@ -16,7 +18,17 @@ const getUsers = async (req, res) => {
   } catch (err) {
     res.status(ERR_DEFAULT).send({ message: err.message });
   }
+  next();
 };
+//   // const { authorization } = await req.headers;
+//   // if (!authorization) {
+//     console.log(authorization);
+//     return res.status(401).send({ message: 'Необходима авторизация' });
+//   }
+//   return User.find({})
+//     .then((users) => res.status(200).send(users))
+//     .catch((err) => res.status(ERR_DEFAULT).send({ message: err.message }));
+// };
 
 const getUserById = async (req, res) => {
   try {
@@ -40,31 +52,24 @@ const createUser = (req, res) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-
+  if (!email || !password) return res.status(400).send({ message: 'Email или пароль не могут быть пустыми.' });
   bcrypt.hash(password, SALT_ROUNDS)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then((user) => res.send({
-      name: user.name, about: user.about, avatar: user.avatar, email: user.email,
-    }))
+    .then(() => res.status(200).send({ message: `Пользователь ${email} успешно создан.` }))
     .catch((err) => {
       if (err.code === 11000) {
         res.status(409).send({ message: 'Такой пользователь уже существует.' });
       }
       if (err.name === 'ValidationError') {
-        res.status(ERR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+        return res.status(400).send({ message: err.message });
       }
-      if (err.code === 'ValidationError') {
-        res.status(ERR_DEFAULT).send({ message: err.message });
-      }
-    })
-    .catch(() => {
-      res.status(ERR_BAD_REQUEST).send({ message: 'Проблема с хешированием пароля' });
+      return res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
 
-const updateUser = (req, res) => {
+const updateUser = (req, res, next) => {
   const userId = req.user._id;
   const { name, about } = req.body;
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
@@ -81,7 +86,8 @@ const updateUser = (req, res) => {
       } else {
         res.status(ERR_DEFAULT).send({ message: err.message });
       }
-    });
+    })
+    .catch(next);
 };
 //   const { name, about } = req.body;
 //   const userId = req.user._id;

@@ -1,26 +1,45 @@
 const jwt = require('jsonwebtoken');
 
-const { JWT_SECRET = 'super-mega-extra-srong-key' } = process.env;
+const JWT_SECRET = 'super-mega-extra-srong-key';
 
-// eslint-disable-next-line consistent-return
-module.exports = (req, res, next) => {
+function getJwtToken(id) {
+  return jwt.sign({ id }, JWT_SECRET);
+};
+
+const isAuthorized = async (token) => {
+  try {
+    const decoded = await jwt.verify(token, JWT_SECRET);
+    return !!decoded;
+  } catch (err) {
+    return false;
+  }
+};
+
+const extractBearerToken = (header) => {
+  return header.replace('Bearer ', '');
+};
+// module.exports = {
+//   getJwtToken,
+//   isAuthorized,
+// };
+
+const auth = (req, res, next) => {
   // достаём авторизационный заголовок
   const { authorization } = req.headers;
 
   // убеждаемся, что он есть или начинается с Bearer
-  if (!authorization || !authorization.startsWith('Bearer ')) {
+  if (!authorization) {
     return res
       .status(401)
       .send({ message: 'Необходима авторизация' });
   }
   // извлечём токен
-  const token = authorization.replace('Bearer ', '');
-
-  // верифицируем токен
+  const token = extractBearerToken(authorization);
+//   // верифицируем токен
   let payload;
   try {
-    // попытаемся верифицировать токен
-    payload = jwt.verify(token, JWT_SECRET);
+//     // попытаемся верифицировать токен
+    payload = isAuthorized(token);
   } catch (err) {
     // отправим ошибку, если не получилось
     return res
@@ -29,6 +48,9 @@ module.exports = (req, res, next) => {
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса
-
-  next(); // пропускаем запрос дальше
+  next();
+};
+module.exports = {
+  auth,
+  getJwtToken,
 };
