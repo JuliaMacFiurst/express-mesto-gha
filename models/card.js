@@ -10,11 +10,18 @@ const cardSchema = mongoose.Schema({
   link: {
     type: String,
     required: true,
-  },
-  owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
-    required: true,
+    validate: {
+      validator(v) {
+        // eslint-disable-next-line no-useless-escape
+        return /(http:\/\/|https:\/\/)(www)*[a-z0-9\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]+#*/.test(v);
+      },
+      message: 'Здесь должна быть url-ссылка',
+    },
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'user',
+      required: true,
+    },
   },
   likes: [{
     type: mongoose.Schema.Types.ObjectId,
