@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-
+// const jwt = require("jsonwebtoken");
 const User = require('../models/user');
 
 const { getJwtToken } = require('../middlewares/auth');
@@ -10,13 +10,14 @@ const {
 function login(req, res) {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).send({ message: 'Email или пароль не могут быть пустыми.' });
-  return User.findUserByCredentials(email, password)
+  User.findOne({ email }).select('+password')
+
     .then((user) => {
       if (!user) return res.status(401).send({ message: 'Неправильная почта или пароль.' });
       return bcrypt.compare(password, user.password)
         .then((isValidPassword) => {
           if (!isValidPassword) return res.status(401).send({ message: 'Неправильная почта или пароль.' });
-          const token = getJwtToken(user.id);
+          const token = getJwtToken({ id: user._id });
           return res.status(200).send({ token });
         });
     })

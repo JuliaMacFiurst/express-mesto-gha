@@ -39,6 +39,11 @@ app.use((req, res, next) => {
 
 app.use(routes);
 
+// Обработаем некорректный маршрут и вернём ошибку 404
+// app.use('*', (req, res) => {
+//   console.log({ message: `Страницы по адресу ${req.baseUrl} не существует` });
+// });
+
 async function main() {
   console.log('Try to connect to MongoDB');
   await mongoose.connect('mongodb://localhost:27017/mestodb');

@@ -57,7 +57,16 @@ const createUser = (req, res) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then(() => res.status(200).send({ message: `Пользователь ${email} успешно создан.` }))
+    .then((user) => {
+      res.send({
+        data: {
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
+          email: user.email,
+        },
+      });
+    })
     .catch((err) => {
       if (err.code === 11000) {
         res.status(409).send({ message: 'Такой пользователь уже существует.' });
@@ -65,7 +74,7 @@ const createUser = (req, res) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: err.message });
       }
-      return res.status(500).send({ message: 'Произошла ошибка' });
+      return res.status(500).send({ message: err.message });
     });
 };
 

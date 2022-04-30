@@ -38,21 +38,21 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.statics.findUserByCredentials = function (email, password) {
-  return this.findOne({ email }).select('+password')
-    .then((user) => {
-      if (!user) {
-        Error.status(401).send({ message: 'Неправильная почта или пароль.' });
-      }
-      return bcrypt.compare(password, user.password)
-        .then((matched) => {
-          if (!matched) {
-            Error.status(401).send({ message: 'Неправильная почта или пароль.' });
-          }
-          return user;
-        });
-    });
-};
+// userSchema.statics.findUserByCredentials = function (email, password) {
+//   return this.findOne({ email }).select('+password')
+//     .then((user) => {
+//       if (!user) {
+//         console.log({ message: 'Неправильная почта или пароль.' });
+//       }
+//       return bcrypt.compare(password, user.password)
+//         .then((matched) => {
+//           if (!matched) {
+//             console.log(401).send({ message: 'Неправильная почта или пароль.' });
+//           }
+//           return user;
+//         });
+//     });
+// };
 
 // создаём модель и экспортируем её
 module.exports = mongoose.model('user', userSchema);
