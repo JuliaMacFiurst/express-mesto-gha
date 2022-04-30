@@ -15,6 +15,7 @@ const { errorOnServer } = require('./errors/SERVER');
 const { PORT = 3000 } = process.env;
 const app = express();
 
+// eslint-disable-next-line consistent-return
 app.use((req, res, next) => {
   const { origin } = req.headers;
   const { method } = req;
