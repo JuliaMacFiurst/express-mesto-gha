@@ -55,14 +55,6 @@ app.use(errors());
 
 app.use(errorOnServer);
 
-async function main() {
-  console.log('Try to connect to MongoDB');
-  await mongoose.connect('mongodb://localhost:27017/mestodb');
-  console.log('Connected');
+mongoose.connect('mongodb://localhost:27017/mestodb');
 
-  app.listen(3000, () => {
-    console.log(`Server listen on ${PORT}`);
-  });
-}
-
-main();
+app.listen(PORT);
