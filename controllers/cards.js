@@ -1,6 +1,7 @@
 const Card = require('../models/card');
 const BAD_REQUEST = require('../errors/BAD_REQUEST');
 const NOT_FOUND = require('../errors/NOT_FOUND');
+const FORBIDDEN = require('../errors/FORBIDDEN');
 
 const getCards = async (req, res, next) => {
   try {
