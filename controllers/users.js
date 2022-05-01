@@ -64,7 +64,7 @@ const updateUser = (req, res, next) => {
   const userId = req.user._id;
 
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send({ user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BAD_REQUEST(err.message);
@@ -79,7 +79,7 @@ const getCurrentUser = (req, res, next) => {
     .catch(() => {
       throw new NOT_FOUND('Пользователь по указанному _id не найден.');
     })
-    .then((currentUser) => res.send({ currentUser }))
+    .then((user) => res.send({ user }))
     .catch(next);
 };
 
