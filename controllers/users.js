@@ -5,7 +5,7 @@ const SALT_ROUNDS = 10;
 const User = require('../models/user');
 const BAD_REQUEST = require('../errors/BAD_REQUEST');
 const NOT_FOUND = require('../errors/NOT_FOUND');
-const CONFLICT = require('../errors/CONFLICT');
+const CONFLICT = require('../errors/Conflict');
 
 const getUsers = async (req, res, next) => {
   try {
