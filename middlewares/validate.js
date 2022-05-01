@@ -25,7 +25,7 @@ const loginValidation = celebrate({
 const userValidation = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(20),
+    about: Joi.string().min(2).max(30),
     avatar: Joi.string().custom(customValidate),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
@@ -42,7 +42,7 @@ const cardValidation = celebrate({
 const userAboutValidation = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    about: Joi.string().required().min(2).max(20),
+    about: Joi.string().required().min(2).max(30),
   }),
 });
 

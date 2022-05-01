@@ -18,7 +18,7 @@ const createCard = async (req, res, next) => {
     const owner = req.user._id;
 
     const card = await Card.create({ name, link, owner });
-    res.send(card);
+    res.send({ card });
   } catch (err) {
     if (err.name === 'ValidationError') {
       throw new BAD_REQUEST(err.message);
@@ -28,7 +28,7 @@ const createCard = async (req, res, next) => {
   }
 };
 
-const deleteCard = async (req, res, next) => {
+const deleteCard = (req, res, next) => {
   const userId = req.user._id;
   const { _id } = req.params;
 
@@ -42,7 +42,7 @@ const deleteCard = async (req, res, next) => {
         Card.findByIdAndRemove(_id)
           .then((cardData) => res.send(cardData));
       } else {
-        throw new FORBIDDEN('Недостаточно прав для удаления карточки');
+        throw new FORBIDDEN('Нет прав для удаления карточки');
       }
     })
     .catch(next);
