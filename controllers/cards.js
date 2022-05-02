@@ -21,7 +21,7 @@ const createCard = async (req, res, next) => {
     res.send({ card });
   } catch (err) {
     if (err.name === 'ValidationError') {
-      throw new BAD_REQUEST(err.message);
+      next(new BAD_REQUEST(err.message));
     } else {
       next(err);
     }
@@ -38,11 +38,11 @@ const deleteCard = (req, res, next) => {
       throw new NOT_FOUND('Карточка с указанным _id не найдена.');
     })
     .then((card) => {
-      if (card.owner.toString() === userId) {
-        Card.findByIdAndRemove(_id)
-          .then((cardData) => res.send(cardData));
-      } else {
+      if (card.owner.toString() !== userId) {
         throw new FORBIDDEN('Нет прав для удаления карточки');
+      } else {
+        return Card.findByIdAndRemove(_id)
+          .then((cardData) => res.send(cardData));
       }
     })
     .catch(next);
@@ -79,7 +79,7 @@ const dislikeCard = async (req, res, next) => {
     }
   } catch (err) {
     if (err.name === 'CastError') {
-      throw new BAD_REQUEST('Переданы некорректные данные для снятии лайка.');
+      next(new BAD_REQUEST('Переданы некорректные данные для снятии лайка.'));
     } else {
       next(err);
     }

@@ -28,8 +28,6 @@ app.use((req, res, next) => {
   if (method === 'OPTIONS') {
     res.header('Access-Control-Allow-Methods', DEFAULT_ALLOWED_METHODS);
     res.header('Access-Control-Allow-Headers', requestHeaders);
-
-    return res.status(200).send();
   }
 
   next();
@@ -47,7 +45,7 @@ app.use('/', auth, usersRoutes);
 app.use('/', auth, cardsRoutes);
 
 // Обработаем некорректный маршрут и вернём ошибку 404
-app.use('*', () => {
+app.use('*', auth, () => {
   throw new NOT_FOUND('Запрашиваемый ресурс не найден');
 });
 

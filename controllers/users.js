@@ -28,7 +28,7 @@ const getUserById = async (req, res, next) => {
     }
   } catch (err) {
     if (err.name === 'CastError') {
-      throw new BAD_REQUEST('Передан некорректный _id пользователя.');
+      next(new BAD_REQUEST('Передан некорректный _id пользователя.'));
     }
     next(err);
   }
@@ -54,6 +54,10 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       if (err.code === 11000) {
         throw new CONFLICT('Такой пользователь уже существует.');
+      } else if (err.name === 'ValidationError') {
+        throw new BAD_REQUEST(err.message);
+      } else {
+        next(err);
       }
     })
     .catch(next);
@@ -68,6 +72,8 @@ const updateUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BAD_REQUEST(err.message);
+      } else {
+        next(err);
       }
     })
     .catch(next);
@@ -75,10 +81,7 @@ const updateUser = (req, res, next) => {
 
 const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
-    .orFail()
-    .catch(() => {
-      throw new NOT_FOUND('Пользователь по указанному _id не найден.');
-    })
+    .orFail(() => new NOT_FOUND('Пользователь по указанному _id не найден.'))
     .then((user) => res.send({ user }))
     .catch(next);
 };
@@ -92,6 +95,8 @@ const updateAvatar = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BAD_REQUEST(err.message);
+      } else {
+        next(err);
       }
     })
     .catch(next);

@@ -13,7 +13,7 @@ const {
 const { userAboutValidation, avatarValidation, idValidation } = require('../middlewares/validate');
 
 routes.get('/users', getUsers);
-routes.get('/users/me', idValidation, getCurrentUser);
+routes.get('/users/me', getCurrentUser);
 routes.get('/users/:_id/', idValidation, getUserById);
 routes.patch('/users/me', userAboutValidation, updateUser);
 routes.patch('/users/me/avatar', avatarValidation, updateAvatar);
