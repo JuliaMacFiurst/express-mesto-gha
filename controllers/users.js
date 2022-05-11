@@ -71,12 +71,11 @@ const updateUser = (req, res, next) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BAD_REQUEST(err.message);
+        next(new BAD_REQUEST(err.message));
       } else {
         next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 const getCurrentUser = (req, res, next) => {
@@ -94,12 +93,11 @@ const updateAvatar = (req, res, next) => {
     .then((avatarData) => res.send({ data: avatarData }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BAD_REQUEST(err.message);
+        next(new BAD_REQUEST(err.message));
       } else {
         next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports = {

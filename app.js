@@ -6,11 +6,12 @@ const { errors } = require('celebrate');
 const { usersRoutes } = require('./routes/users');
 const { cardsRoutes } = require('./routes/cards');
 const auth = require('./middlewares/auth');
-const { login } = require('./controllers/login');
+const { login, logout } = require('./controllers/login');
 const { createUser } = require('./controllers/users');
 const NOT_FOUND = require('./errors/NOT_FOUND');
 const { loginValidation, userValidation } = require('./middlewares/validate');
 const { errorOnServer } = require('./errors/SERVER');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -38,8 +39,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(cookieParser());
 
+app.use(requestLogger);
+
 app.post('/signin', loginValidation, login);
 app.post('/signup', userValidation, createUser);
+app.post('/logout', logout);
 
 app.use('/', auth, usersRoutes);
 app.use('/', auth, cardsRoutes);
@@ -48,6 +52,8 @@ app.use('/', auth, cardsRoutes);
 app.use('*', auth, () => {
   throw new NOT_FOUND('Запрашиваемый ресурс не найден');
 });
+
+app.use(errorLogger);
 
 app.use(errors());
 

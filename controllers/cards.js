@@ -33,10 +33,7 @@ const deleteCard = (req, res, next) => {
   const { _id } = req.params;
 
   Card.findById(_id)
-    .orFail()
-    .catch(() => {
-      throw new NOT_FOUND('Карточка с указанным _id не найдена.');
-    })
+    .orFail(() => new NOT_FOUND('Карточка с указанным _id не найдена.'))
     .then((card) => {
       if (card.owner.toString() !== userId) {
         throw new FORBIDDEN('Нет прав для удаления карточки');

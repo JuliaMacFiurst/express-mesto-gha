@@ -23,6 +23,11 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
+const logout = (req, res) => {
+  res.status(200).clearCookie('jwt').send({ message: 'Выход' });
+};
+
 module.exports = {
   login,
+  logout,
 };
