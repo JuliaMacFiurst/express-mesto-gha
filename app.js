@@ -16,6 +16,12 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { PORT = 3000 } = process.env;
 const app = express();
 
+const allowedCors = [
+  'http://mesto.juliamakhlin.nomoredomains.xyz/',
+  'http://api.mesto.juliamakhlin.nomoredomains.xyz/',
+  'localhost:3000',
+];
+
 // eslint-disable-next-line consistent-return
 app.use((req, res, next) => {
   const { origin } = req.headers;
@@ -26,9 +32,15 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', origin);
   res.header('Access-Control-Allow-Credentials', 'true');
 
+  if (allowedCors.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+  }
   if (method === 'OPTIONS') {
     res.header('Access-Control-Allow-Methods', DEFAULT_ALLOWED_METHODS);
     res.header('Access-Control-Allow-Headers', requestHeaders);
+
+    return res.end();
   }
 
   next();
