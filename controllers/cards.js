@@ -6,7 +6,7 @@ const FORBIDDEN = require('../errors/Forbidden');
 const getCards = async (req, res, next) => {
   try {
     const cards = await Card.find({});
-    res.send(cards);
+    res.send({ data: cards });
   } catch (err) {
     next(err);
   }
@@ -18,7 +18,7 @@ const createCard = async (req, res, next) => {
     const owner = req.user._id;
 
     const card = await Card.create({ name, link, owner });
-    res.send({ card });
+    res.send({ data: card });
   } catch (err) {
     if (err.name === 'ValidationError') {
       next(new BAD_REQUEST(err.message));
@@ -55,7 +55,7 @@ const likeCard = async (req, res, next) => {
     if (!card) {
       throw new NOT_FOUND('Передан несуществующий _id карточки.');
     } else {
-      res.send({ card });
+      res.send({ data: card });
     }
   } catch (err) {
     next(err);
@@ -72,7 +72,7 @@ const dislikeCard = async (req, res, next) => {
     if (!card) {
       throw new NOT_FOUND('Передан несуществующий _id карточки.');
     } else {
-      res.send({ card });
+      res.send({ data: card });
     }
   } catch (err) {
     if (err.name === 'CastError') {
