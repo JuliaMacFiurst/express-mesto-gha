@@ -81,7 +81,7 @@ const updateUser = (req, res, next) => {
 const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .orFail(() => new NOT_FOUND('Пользователь по указанному _id не найден.'))
-    .then((user) => res.send({ user }))
+    .then((currentUser) => res.send({ currentUser }))
     .catch(next);
 };
 
