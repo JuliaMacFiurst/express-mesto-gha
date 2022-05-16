@@ -45,42 +45,30 @@ const deleteCard = (req, res, next) => {
     .catch(next);
 };
 
-const likeCard = async (req, res, next) => {
-  try {
-    const card = await Card.findByIdAndUpdate(
-      req.params._id,
-      { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-      { new: true },
-    );
-    if (!card) {
-      throw new NOT_FOUND('Передан несуществующий _id карточки.');
-    } else {
-      res.send({ card });
-    }
-  } catch (err) {
-    next(err);
-  }
+const likeCard = (req, res, next) => {
+  Card.findByIdAndUpdate(
+    req.params._id,
+    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+    { new: true },
+  )
+    .orFail(() => {
+      throw new NOT_FOUND('Карточка с таким id не найдена');
+    })
+    .then((likes) => res.send({ data: likes }))
+    .catch(next);
 };
 
-const dislikeCard = async (req, res, next) => {
-  try {
-    const card = await Card.findByIdAndUpdate(
-      req.params._id,
-      { $pull: { likes: req.user._id } }, // убрать _id из массива
-      { new: true },
-    );
-    if (!card) {
-      throw new NOT_FOUND('Передан несуществующий _id карточки.');
-    } else {
-      res.send({ card });
-    }
-  } catch (err) {
-    if (err.name === 'CastError') {
-      next(new BAD_REQUEST('Переданы некорректные данные для снятии лайка.'));
-    } else {
-      next(err);
-    }
-  }
+const dislikeCard = (req, res, next) => {
+  Card.findByIdAndUpdate(
+    req.params._id,
+    { $pull: { likes: req.user._id } }, // убрать _id из массива
+    { new: true },
+  )
+    .orFail(() => {
+      throw new NOT_FOUND('Карточка с таким id не найдена');
+    })
+    .then((likes) => res.send({ data: likes }))
+    .catch(next);
 };
 
 module.exports = {
