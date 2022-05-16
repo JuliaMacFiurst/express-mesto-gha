@@ -55,7 +55,7 @@ const likeCard = async (req, res, next) => {
     if (!card) {
       throw new NOT_FOUND('Передан несуществующий _id карточки.');
     } else {
-      res.send({ data: card.likes });
+      res.send({ card });
     }
   } catch (err) {
     next(err);
@@ -72,7 +72,7 @@ const dislikeCard = async (req, res, next) => {
     if (!card) {
       throw new NOT_FOUND('Передан несуществующий _id карточки.');
     } else {
-      res.send({ data: card.likes });
+      res.send({ card });
     }
   } catch (err) {
     if (err.name === 'CastError') {
