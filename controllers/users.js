@@ -53,9 +53,9 @@ const createUser = (req, res, next) => {
     }))
     .catch((err) => {
       if (err.code === 11000) {
-        throw new CONFLICT('Такой пользователь уже существует.');
+        next(new CONFLICT('Такой пользователь уже существует.'));
       } else if (err.name === 'ValidationError') {
-        throw new BAD_REQUEST(err.message);
+        next(new BAD_REQUEST(err.message));
       } else {
         next(err);
       }
