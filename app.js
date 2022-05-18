@@ -14,6 +14,8 @@ const { loginValidation, userValidation } = require('./middlewares/validate');
 const { errorOnServer } = require('./errors/SERVER');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
+console.log(process.env);
+
 const { PORT = 3000 } = process.env;
 const app = express();
 
